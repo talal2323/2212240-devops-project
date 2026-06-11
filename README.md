@@ -82,4 +82,4 @@ git clone [https://github.com/talal2323/2212240-devops-project](https://github.c
 cd ~/devops-project
 cp .env.example .env
 docker compose up -d --build
-```
+```Deployment Triggered
