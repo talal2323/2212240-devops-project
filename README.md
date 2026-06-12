@@ -3,7 +3,7 @@
 > **Name:** Talal Yousuf Salat  
 > **Registration Number:** 2212240  
 > **Course:** DevOps Fundamentals  
-> **Live URL:** http://YOUR_EC2_IP:8000  
+> **Live URL:** http://100.30.172.126:8000  
 
 ---
 
@@ -18,7 +18,7 @@ GitHub Push
     │
     └── CD Pipeline (GitHub Actions)
             └── SSH into EC2
-                    └── git pull + docker compose up --build
+                    └── git pull + docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
 **Services Backend Component:**
@@ -64,22 +64,34 @@ You can test the health checks and endpoints directly via your terminal or web b
 | **POST** | `/students` | Insert a new record into the PostgreSQL persistent data layer |
 | **GET** | `/students` | Fetch and compile a collection list of all saved records |
 | **GET** | `/students/{reg_no}` | Query details for a specific record via its unique registration identifier |
+| **DELETE** | `/students/{student_id}` | Remove a specific student record from the database via its unique ID |
 
 ---
 
 ## ☁️ Production EC2 Deployment (Reference Guide)
 
+The live application is hosted on an AWS EC2 instance. The environment is separated from local development using a dedicated production configuration.
+
 ```bash
 # Securely connect into the cloud computing instance
-ssh -i your-key.pem ubuntu@YOUR_EC2_IP
+ssh -i ~/.ssh/2212240-project-key ubuntu@100.30.172.126
 
-# Initialize updates and prepare the Docker container runtime engine
-sudo apt update && sudo apt install -y docker.io docker-compose-plugin
-sudo usermod -aG docker ubuntu
+# Navigate to the project directory (assuming it is already cloned)
+cd ~/2212240-devops-project
 
-# Clone core codebase, provision environment secrets, and build infrastructure live
-git clone [https://github.com/talal2323/2212240-devops-project](https://github.com/talal2323/2212240-devops-project) ~/devops-project
-cd ~/devops-project
-cp .env.example .env
-docker compose up -d --build
-```Deployment Triggered
+# Ensure the production environment variables are active
+cp .env.production .env
+
+# Build and deploy the production infrastructure
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+
+**Data Persistence Management:**
+To restart the server without losing data:
+```bash
+docker-compose -f docker-compose.prod.yml restart
+```
+To perform a complete wipe of the database (Warning: Destroys all data):
+```bash
+docker-compose -f docker-compose.prod.yml down -v
+```
